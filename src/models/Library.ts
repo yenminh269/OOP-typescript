@@ -1,14 +1,20 @@
+import { BookStatus } from "../enums/BookStatus";
 import { Book } from "./Book";
 
 export class Library {
   private books: Book[] = [];
 
-  addBook(book: Book): void {
-    this.books.push(book);
+  addBooks(books: Book[]): void {
+    this.books = [...this.books, ...books];
   }
 
   getBooks(): readonly Book[] {
     return this.books;
   }
 
+  showBooks(){
+    console.log("List of books: ");
+    this.books.forEach((book) => { 
+      console.log("ID " + book.getId() + " - Title: " + book.getTitle()); })
+  }
 };

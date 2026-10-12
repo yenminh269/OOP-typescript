@@ -1,31 +1,35 @@
-import {Person} from "../interfaces/Person";
 import {BookStatus} from "../enums/BookStatus";
-export class Book extends Person {
-  private title: string;
+
+export class Book {
   private author: string;
   private status: BookStatus;
-  constructor(
-    id: number,
-    name: string,
-    title: string,
-    author: string,
-    status: BookStatus
-  ) {
-    super(id, name);
+  private id: string;
+  private title: string;
+
+  constructor(id: string, title: string, author: string, status: BookStatus) {
+    this.id = id;
     this.title = title;
     this.author = author;
     this.status = status;
   }
-  getTitle(id: number): string {
+
+  getId(): string {
+    return this.id;
+  }
+
+  getTitle(): string {
     return this.title;
   }
-  getAuthor(id: number): string {
+
+  getAuthor(): string {
     return this.author;
   }
-  getStatus(id: number): BookStatus {
+
+  getStatus(): BookStatus {
     return this.status;
   }
-  getName(id: number): string {
-    return this.name;
+
+  setStatus(_status : BookStatus){
+    this.status = _status;
   }
 }

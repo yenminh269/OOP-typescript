@@ -1,22 +1,34 @@
 import { Person } from "../interfaces/Person";
 import { LibraryService } from "../services/LibraryService";
 
-export class Admin extends Person {
+export class Admin implements Person {
   LibraryService: LibraryService;
-  constructor(id: number, name: string, libraryService: LibraryService) {
-    super(id, name);
-    this.LibraryService = libraryService;
+  id: string;
+  name: string;
+
+  constructor(_id: string, _name: string, _libraryService: LibraryService) {
+    this.id = _id;
+    this.name = _name;
+    this.LibraryService = _libraryService;
   }
 
-  addBook(book: any): void {
-    this.LibraryService.addBook(book);
+  getId() : string {
+    return this.id;
   }
 
-  showBookDetails(bookId: number): void {
-    this.LibraryService.showBookDetails(bookId);
+  getName() : string {
+    return this.name;
+  }
+  
+  showBookDetails(bookId: string): void {
+    const book = this.LibraryService.getBookDetails(bookId);
+    console.log(`Details for book with ID: ${bookId}`);
+    console.log(`Title: ` + book.getTitle());
+    console.log(`Author: ` + book.getAuthor());
+    console.log(`Status: ` + book.getStatus());
   }
 
-  showBookStatus(bookId: number): void {
-    this.LibraryService.showBookStatus(bookId);
+  showBookStatus(bookId: string): void {
+    console.log(`Book ID status: ` + this.LibraryService.getBookStatus(bookId));
   }
 }

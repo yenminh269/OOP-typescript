@@ -1,47 +1,100 @@
 import { Person } from "./interfaces/Person";
 import {PersonService} from "./services/PersonService";
 import { LibraryService } from "./services/LibraryService";
-import { BookStatus } from "./enums/BookStatus";
 import { createInterface } from "node:readline/promises";
+import { Admin } from "./models/Admin";
+import { Borrower } from "./models/Borrower";
 
 const rl = createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
-const adminId = 1;
+const adminId = "1";
 const adminName = "Mincy";
-const borrowerId = 2;
+
+const borrowerId = "2";
 const borrowerName = "Alex";
 
-console.log("***Library Management System***");
-console.log("Type 1 to log in as Admin or Type 2 to log in as Borrower");
+const personService = new PersonService();
+const libraryService = new LibraryService();
+
+let answer;
 
 async function main() {
-  const answer = await rl.question("What is your choice? ");
-  answer === adminId.toString() ? 
-    console.log(`You logged in as Admin: ${adminName}`) :
-    console.log(`You logged in as Borrower: ${borrowerName}`);
-  const user = createUser(answer);
-}
-main().then(() => rl.close());
+  console.log("***Library Management System***");
+
+  answer = await logIn();
   
+  const user = createUser(answer);
 
+  answer = await displayFeatures(user);
+ 
+  processChoice(answer, user);
+}
 
-function createUser(choice: string) {
-  const personService = new PersonService();
-  const libraryServiceInstance = new LibraryService();
-  const user = choice === adminId.toString() ? 
-    personService.createAdmin(adminId, adminName, libraryServiceInstance) :
-    personService.createBorrower(borrowerId, borrowerName, new Date("2024-01-01"), new Date("2024-01-15"));
+main();
 
+async function logIn(){  
+  console.log("Select the log in options below:")
+  console.log("1. Log in as Admin");
+  console.log("2. Log in as Borrower");
+  return await rl.question("Enter your choice: ");
+}
+
+function createUser(choice : any) {
+  const user = choice === adminId 
+    ? personService.createAdmin(adminId, adminName, libraryService) 
+    : personService.createBorrower(borrowerId, borrowerName, libraryService);
     return user;
 }
 
-// const borrower1 = personService.createBorrower(2, "John Doe", new Date("2024-01-01"), new Date("2024-01-15"));
-// console.log(`Borrower created: ${borrower1.getName(2)}, Borrow Date: ${borrower1.getBorrowDate(2)}, Return Date: ${borrower1.getReturnDate(2)}`);
+async function displayFeatures(user: Person){
+  console.log("Select the features below:")
+  return user.getId() == adminId ? await adminActions() : await borrowerActions();
+}
 
-// admin.addBook({ id: 101, title: "The Great Gatsby", author: "F. Scott Fitzgerald", status: BookStatus.AVAILABLE });
-// admin.addBook({ id: 102, title: "To Kill a Mockingbird", author: "Harper Lee", status: BookStatus.BORROWED });
+async function adminActions(){
+  console.log("1. Show book details");
+  console.log("2. Show book status");
+  return await rl.question("Enter your choice: ");
+}
+
+async function borrowerActions(){
+  console.log("1. Borrow book");
+  console.log("2. Return book");
+  return await rl.question("Enter your choice: ");
+}
+  
+async function processChoice(answer : string, user : Person){
+  if(user instanceof Admin){
+    if(answer == "1"){
+      answer = await rl.question("Type the book ID to view details: ");
+
+      user.showBookDetails(answer);
+    }else {
+      answer = await rl.question("Type the book ID to view status: ");
+
+      user.showBookStatus(answer);
+    }
+  }else if(user instanceof Borrower) {
+    if(answer == "1"){
+      libraryService.showBooks();
+
+      answer = await rl.question("Type the book ID to borrow: ");
+      user.borrowBook(answer);
+    }else{
+      answer = await rl.question("Type the book ID to return: ");
+      user.returnBook(answer);
+    }
+  }
+  
+  console.log("***THANK YOU FOR YOUR BUSINESS***");
+
+  rl.close();
+}
+
+
+
 
 
